@@ -71,20 +71,20 @@ const nextConfig: NextConfig = {
   },
 
   // Rewrite for API routes if needed
-  async rewrites() {
-    return {
-      beforeFiles: [
-        {
-          source: "/sitemap.xml",
-          destination: "/api/sitemap",
-        },
-        {
-          source: "/robots.txt",
-          destination: "/api/robots",
-        },
-      ],
-    };
-  },
+  // async rewrites() {
+  //   return {
+  //     beforeFiles: [
+  //       {
+  //         source: "/sitemap.xml",
+  //         destination: "/api/sitemap",
+  //       },
+  //       {
+  //         source: "/robots.txt",
+  //         destination: "/api/robots",
+  //       },
+  //     ],
+  //   };
+  // },
 };
 
 export default nextConfig;
