@@ -1,0 +1,10 @@
+open street map
+
+normal user 
+route free
+google signup
+route free 
+google signup
+add source stand, destination stand
+review system is this correct ? and route is correct? 
+add fare 
