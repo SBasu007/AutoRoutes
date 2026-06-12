@@ -90,6 +90,7 @@ export default function RootLayout({
     return (
         <html lang="en">
             <head>
+                <meta name="msvalidate.01" content="D58CC15D52E6C09C5E17E74D0296B7FF" />
                 <script
                     type="application/ld+json"
                     dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}
