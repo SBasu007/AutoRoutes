@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 
 export default function Sidebar() {
     const pathname = usePathname();
+    const showContributor = process.env.NEXT_PUBLIC_SHOW_CONTRIBUTOR === "true";
 
     const menu = [
         {
@@ -13,11 +14,11 @@ export default function Sidebar() {
             icon: Map,
             href: "/route-finder",
         },
-        {
+        ...(showContributor ? [{
             name: "Contributor",
             icon: Users,
             href: "/contributor",
-        },
+        }] : []),
         {
             name: "Profile",
             icon: User,

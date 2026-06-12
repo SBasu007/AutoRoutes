@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:5000/api/contributor';
+const BASE_URL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/contributor`;
 
 export type StandData = {
     name: string;
