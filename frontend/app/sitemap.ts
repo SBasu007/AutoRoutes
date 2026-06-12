@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://autoroutekolkata.com';
+  const baseUrl = 'https://mapmyauto.com';
   
   // Main pages
   const staticPages = [

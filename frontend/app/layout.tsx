@@ -5,14 +5,14 @@ export const metadata: Metadata = {
     title: "Auto Route Finder Kolkata | Find Nearest Auto Stand & Shared Auto Routes",
     description: "Find auto routes in Kolkata with ease. Discover nearest auto stands, shared auto services, auto to airport routes, and the best auto route finder near you. Get real-time auto availability and fare information.",
     keywords: "auto route finder Kolkata, auto stand near me, shared auto near me, nearest auto route, auto to airport Kolkata, auto route Kolkata, Kolkata auto routes, Kolkata auto map, auto stand Kolkata, route planner Kolkata, local transport Kolkata",
-    metadataBase: new URL("https://autoroutekolkata.com"),
+    metadataBase: new URL("https://mapmyauto.com"),
     alternates: {
-        canonical: "https://autoroutekolkata.com",
+        canonical: "https://mapmyauto.com",
     },
     openGraph: {
         type: "website",
         locale: "en_IN",
-        url: "https://autoroutekolkata.com",
+        url: "https://mapmyauto.com",
         siteName: "Auto Route Finder Kolkata",
         title: "Auto Route Finder Kolkata | Find Nearest Auto & Shared Services",
         description: "Find the best auto routes, nearest auto stands, and shared auto services in Kolkata. Navigate easily with our route finder.",
@@ -60,7 +60,7 @@ export default function RootLayout({
         "@type": "WebApplication",
         name: "Auto Route Finder Kolkata",
         description: "Find auto routes, nearest auto stands, and shared auto services in Kolkata",
-        url: "https://autoroutekolkata.com",
+        url: "https://mapmyauto.com",
         applicationCategory: "UtilitiesApplication",
         offers: {
             "@type": "Offer",
@@ -72,7 +72,7 @@ export default function RootLayout({
             "@type": "SearchAction",
             target: {
                 "@type": "EntryPoint",
-                urlTemplate: "https://autoroutekolkata.com/route-finder?search={search_term_string}",
+                urlTemplate: "https://mapmyauto.com/route-finder?search={search_term_string}",
             },
             "query-input": "required name=search_term_string",
         },
