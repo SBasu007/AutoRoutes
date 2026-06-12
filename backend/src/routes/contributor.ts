@@ -1,7 +1,7 @@
 // src/routes/contributor.ts
 import { Router } from 'express';
-import { db } from '../db';
-import { stands, routes, routeStops } from '../db/schema';
+import { db } from '../db/index.js';
+import { stands, routes, routeStops } from '../db/schema.js';
 import { asc, eq } from 'drizzle-orm';
 import { z } from 'zod';
 import { alias } from 'drizzle-orm/pg-core';

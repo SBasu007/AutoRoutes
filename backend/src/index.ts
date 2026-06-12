@@ -3,7 +3,7 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
-import contributorRoutes from './routes/contributor';
+import contributorRoutes from './routes/contributor.js';
 
 const app = express();
 
