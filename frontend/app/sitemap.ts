@@ -31,14 +31,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 
-  // Dynamic routes for common search queries and locations
+  // Dynamic routes - WITHOUT query parameters (query params cause XML issues)
   const dynamicRoutes = [
-    '/route-finder?from=dumdum&to=airport',
-    '/route-finder?from=howrah&to=airport',
-    '/route-finder?from=sealdah&to=newtown',
-    '/route-finder?from=saltlake&to=airport',
-    '/route-finder?from=dakshineswar&to=airport',
-    '/route-finder?from=newtown&to=airport',
+    '/route-finder',
   ].map((path) => ({
     url: `${baseUrl}${path}`,
     lastModified: new Date(),
