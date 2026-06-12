@@ -1,0 +1,3 @@
+// This file should be updated with your Google Search Console verification code
+// Replace YOUR_VERIFICATION_CODE with the actual code from Google Search Console
+google-site-verification: YOUR_VERIFICATION_CODE

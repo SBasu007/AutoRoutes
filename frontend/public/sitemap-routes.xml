@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  
+  <!-- Popular Auto Routes -->
+  <url>
+    <loc>https://autoroutekolkata.com/route-finder?route=auto%20from%20dumdum%20to%20airport</loc>
+    <lastmod>2024-12-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://autoroutekolkata.com/route-finder?route=shared%20auto%20from%20howrah%20station</loc>
+    <lastmod>2024-12-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://autoroutekolkata.com/route-finder?route=cheapest%20route%20to%20sector%20v</loc>
+    <lastmod>2024-12-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://autoroutekolkata.com/route-finder?route=auto%20from%20new%20town%20to%20airport</loc>
+    <lastmod>2024-12-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://autoroutekolkata.com/route-finder?route=auto%20available%20near%20me</loc>
+    <lastmod>2024-12-01</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://autoroutekolkata.com/route-finder?route=auto%20to%20airport%20kolkata</loc>
+    <lastmod>2024-12-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://autoroutekolkata.com/route-finder?route=kolkata%20local%20transport%20guide</loc>
+    <lastmod>2024-12-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://autoroutekolkata.com/route-finder?route=kolkata%20route%20planner</loc>
+    <lastmod>2024-12-01</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+</urlset>

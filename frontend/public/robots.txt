@@ -1,0 +1,45 @@
+# Auto Route Finder Kolkata - robots.txt
+# Allow search engines to crawl and index the site
+
+User-agent: *
+Allow: /
+Allow: /route-finder
+Allow: /contributor
+Allow: /profile
+Disallow: /api/
+Disallow: /_next/
+Disallow: /static/
+
+# Specific rules for Google
+User-agent: Googlebot
+Allow: /
+
+# Specific rules for Bing
+User-agent: Bingbot
+Allow: /
+
+# Specific rules for other crawlers
+User-agent: Slurp
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+# Sitemap location
+Sitemap: https://autoroutekolkata.com/sitemap.xml
+Sitemap: https://autoroutekolkata.com/sitemap-auto-stands.xml
+Sitemap: https://autoroutekolkata.com/sitemap-routes.xml
+
+# Crawl-delay to prevent server overload
+Crawl-delay: 1
+Request-rate: 30/60
+
+# Additional rules for bot management
+User-agent: MJ12bot
+Allow: /
+
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /

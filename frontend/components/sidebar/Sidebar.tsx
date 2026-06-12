@@ -10,33 +10,37 @@ export default function Sidebar() {
 
     const menu = [
         {
-            name: "Find",
+            name: "Find Routes",
             icon: Map,
             href: "/route-finder",
+            ariaLabel: "Find auto routes, nearest auto stand, and shared auto services near you",
         },
         ...(showContributor ? [{
             name: "Contributor",
             icon: Users,
             href: "/contributor",
+            ariaLabel: "Add new auto stands and routes to help the community",
         }] : []),
         {
             name: "Profile",
             icon: User,
             href: "/profile",
+            ariaLabel: "Manage your profile and favorite routes",
         },
     ];
 
     return (
         <>
             {/* Desktop Sidebar */}
-            <aside className="hidden md:flex w-72 bg-white border-r flex-col">
+            <aside className="hidden md:flex w-72 bg-white border-r flex-col" role="navigation" aria-label="Main navigation for auto route finder">
                 <div className="p-6 border-b">
                     <h1 className="font-bold text-xl text-black">
-                        🛺 Auto Route Finder
+                        🛺 Auto Route Finder Kolkata
                     </h1>
+                    <p className="text-xs text-gray-500 mt-2">Find nearest auto, shared auto routes, and auto stands in Kolkata</p>
                 </div>
 
-                <nav className="p-4 space-y-2">
+                <nav className="p-4 space-y-2" aria-label="Navigation menu">
                     {menu.map((item) => {
                         const Icon = item.icon;
 
@@ -44,6 +48,8 @@ export default function Sidebar() {
                             <Link
                                 key={item.href}
                                 href={item.href}
+                                title={item.ariaLabel}
+                                aria-label={item.ariaLabel}
                                 className={`flex items-center gap-3 p-3 rounded-xl transition
                                 ${pathname === item.href
                                         ? "bg-blue-500 text-white"
@@ -56,6 +62,16 @@ export default function Sidebar() {
                         );
                     })}
                 </nav>
+                
+                <div className="mt-auto p-4 border-t text-xs text-gray-500">
+                    <p className="font-semibold mb-2">Popular Searches:</p>
+                    <div className="space-y-1">
+                        <p>• Auto near Dumdum Airport</p>
+                        <p>• Shared Auto Howrah Station</p>
+                        <p>• Route to Sector V</p>
+                        <p>• Auto Stand Sealdah</p>
+                    </div>
+                </div>
             </aside>
 
             {/* Mobile Bottom Navigation */}
@@ -71,6 +87,7 @@ export default function Sidebar() {
     w-[92%]
     max-w-sm
   "
+                aria-label="Mobile navigation"
             >
                 <div
                     className="
@@ -93,6 +110,9 @@ export default function Sidebar() {
                                 <Link
                                     key={item.href}
                                     href={item.href}
+                                    title={item.ariaLabel}
+                                    aria-label={item.ariaLabel}
+                                    aria-current={active ? "page" : undefined}
                                     className={`
               flex
               flex-col
@@ -111,6 +131,7 @@ export default function Sidebar() {
                                     <Icon
                                         size={20}
                                         strokeWidth={active ? 2.5 : 2}
+                                        aria-hidden="true"
                                     />
 
                                     <span className="text-xs mt-1 font-medium">
