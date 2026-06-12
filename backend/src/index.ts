@@ -8,7 +8,7 @@ import contributorRoutes from './routes/contributor.js';
 const app = express();
 
 app.use(helmet());
-app.use(cors({ origin: 'http://localhost:3000' })); // your Next.js frontend
+app.use(cors({ origin: process.env.FRONTEND_URL || 'http://localhost:3000' }));
 app.use(express.json());
 
 app.use('/api/contributor', contributorRoutes);
