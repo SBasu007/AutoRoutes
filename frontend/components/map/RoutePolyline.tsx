@@ -34,9 +34,9 @@ export default function RoutePolyline() {
                             click: () => setSelectedRoute(route)
                         }}
                         pathOptions={{
-                            color: isSelected ? "#ef4444" : "#000000",
-                            weight: isSelected ? 8 : 5,
-                            opacity: isSelected ? 1 : 0.6,
+                            color: isSelected ? "#ef4444" : "#9ca3af",
+                            weight: isSelected ? 8 : 4,
+                            opacity: isSelected ? 1 : 0.5,
                         }}
                     />
                 );

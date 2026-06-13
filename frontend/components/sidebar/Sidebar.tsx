@@ -15,12 +15,12 @@ export default function Sidebar() {
             href: "/route-finder",
             ariaLabel: "Find auto routes, nearest auto stand, and shared auto services near you",
         },
-        ...(showContributor ? [{
+        {
             name: "Contributor",
             icon: Users,
             href: "/contributor",
             ariaLabel: "Add new auto stands and routes to help the community",
-        }] : []),
+        },
         {
             name: "Profile",
             icon: User,
@@ -35,7 +35,7 @@ export default function Sidebar() {
             <aside className="hidden md:flex w-72 bg-white border-r flex-col" role="navigation" aria-label="Main navigation for auto route finder">
                 <div className="p-6 border-b">
                     <h1 className="font-bold text-xl text-black">
-                        🛺 Auto Route Finder Kolkata
+                        Map My Auto 🛺
                     </h1>
                     <p className="text-xs text-gray-500 mt-2">Find nearest auto, shared auto routes, and auto stands in Kolkata</p>
                 </div>
@@ -62,7 +62,7 @@ export default function Sidebar() {
                         );
                     })}
                 </nav>
-                
+
                 <div className="mt-auto p-4 border-t text-xs text-gray-500">
                     <p className="font-semibold mb-2">Popular Searches:</p>
                     <div className="space-y-1">

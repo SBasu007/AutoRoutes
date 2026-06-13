@@ -50,6 +50,12 @@ export async function getRoutes() {
     return res.json();
 }
 
+export async function getNearbyRoutes(lat: number, lng: number, radius = 1) {
+    const res = await fetch(`${BASE_URL}/routes/nearby?lat=${lat}&lng=${lng}&radius=${radius}`);
+    if (!res.ok) throw new Error('Failed to fetch nearby routes');
+    return res.json();
+}
+
 export async function addRoute(data: RouteData, token?: string) {
     const headers: Record<string, string> = {
         'Content-Type': 'application/json',

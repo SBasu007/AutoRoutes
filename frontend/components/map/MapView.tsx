@@ -23,10 +23,29 @@ function MapUpdater() {
     const {
         source,
         destination,
+        selectedRoute,
     } = useRouteStore();
 
     useEffect(() => {
-        if (source && destination) {
+        if (selectedRoute) {
+            let path = [];
+            try {
+                path = selectedRoute.path ? JSON.parse(selectedRoute.path) : [];
+            } catch {}
+
+            if (path.length > 0) {
+                const bounds: [number, number][] = path.map((p: any) => [p.lat, p.lng]);
+                map.fitBounds(bounds, { padding: [80, 80] });
+            } else if (selectedRoute.from && selectedRoute.to) {
+                map.fitBounds(
+                    [
+                        [selectedRoute.from.lat, selectedRoute.from.lng],
+                        [selectedRoute.to.lat, selectedRoute.to.lng],
+                    ],
+                    { padding: [80, 80] }
+                );
+            }
+        } else if (source && destination) {
             map.fitBounds(
                 [
                     [source.lat, source.lon],
@@ -37,7 +56,7 @@ function MapUpdater() {
                 }
             );
         }
-    }, [source, destination, map]);
+    }, [source, destination, selectedRoute, map]);
 
     return null;
 }

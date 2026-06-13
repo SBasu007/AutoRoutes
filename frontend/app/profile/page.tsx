@@ -1,29 +1,14 @@
 "use client";
 
-import Sidebar from "../../components/sidebar/Sidebar";
+import ProfileComingSoon from "../../components/coming-soon/ProfileComingSoon";
+import ProfileContent from "./ProfileContent";
 
-export default function ContributorPage() {
-    return (
-        <div className="h-screen flex">
+export default function ProfilePage() {
+    const showContributor = process.env.NEXT_PUBLIC_SHOW_CONTRIBUTOR === "true";
 
-            <Sidebar />
+    if (!showContributor) {
+        return <ProfileComingSoon />;
+    }
 
-            <div className="flex-1 flex items-center justify-center bg-gray-100 pb-20 md:pb-0">
-
-                <div className="bg-white p-10 rounded-2xl border">
-
-                    <h1 className="text-2xl font-bold mb-2">
-                        Contributor Panel
-                    </h1>
-
-                    <p className="text-gray-500">
-                        Coming Soon...
-                    </p>
-
-                </div>
-
-            </div>
-
-        </div>
-    );
+    return <ProfileContent />;
 }
