@@ -20,20 +20,31 @@ export default function StationSearch({
     const [query, setQuery] = useState("");
     const [results, setResults] = useState<Station[]>([]);
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
 
     useEffect(() => {
         const timer = setTimeout(async () => {
             if (query.trim().length < 3) {
                 setResults([]);
+                setError("");
                 return;
             }
 
             try {
                 setLoading(true);
+                setError("");
 
                 const data = await searchLocation(query);
 
                 setResults(data.slice(0, 6));
+            } catch (err: any) {
+                if (err.name === "AbortError") {
+                    // Ignore abort errors
+                    return;
+                }
+                console.error("Search error:", err);
+                setError(err.message || "Failed to search locations");
+                setResults([]);
             } finally {
                 setLoading(false);
             }
@@ -85,7 +96,7 @@ export default function StationSearch({
             </div>
 
             {/* Dropdown */}
-            {(results.length > 0 || loading) && (
+            {(results.length > 0 || loading || error) && (
                 <div
                     className="
             absolute
@@ -107,7 +118,13 @@ export default function StationSearch({
                         </div>
                     )}
 
-                    {!loading &&
+                    {!loading && error && (
+                        <div className="px-4 py-3 text-sm text-red-500 font-medium">
+                            {error}
+                        </div>
+                    )}
+
+                    {!loading && !error &&
                         results.map((item) => (
                             <button
                                 key={item.id}
