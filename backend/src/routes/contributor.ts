@@ -52,6 +52,7 @@ router.post('/stands', async (req, res) => {
         const result = await db.insert(stands).values({
             ...data,
             addedBy: 'anonymous',
+            status: 'pending',
         }).returning();
 
         res.status(201).json(result[0]);
@@ -62,7 +63,7 @@ router.post('/stands', async (req, res) => {
 
 // Get All Stands
 router.get('/stands', async (req, res) => {
-    const allStands = await db.select().from(stands);
+    const allStands = await db.select().from(stands).where(eq(stands.status, 'approved'));
     res.json(allStands);
 });
 
@@ -85,6 +86,7 @@ router.post('/routes', async (req, res) => {
                     path: JSON.stringify(data.path),
 
                     addedBy: 'anonymous',
+                    status: 'pending',
                 })
                 .returning();
 
@@ -167,7 +169,8 @@ router.get('/routes', async (req, res) => {
                     toStand.id,
                     routes.toStandId
                 )
-            );
+            )
+            .where(eq(routes.status, 'approved'));
 
     const routesWithStops =
         await Promise.all(
@@ -249,7 +252,8 @@ router.get('/routes/nearby', async (req, res) => {
         })
             .from(routes)
             .leftJoin(fromStand, eq(fromStand.id, routes.fromStandId))
-            .leftJoin(toStand, eq(toStand.id, routes.toStandId));
+            .leftJoin(toStand, eq(toStand.id, routes.toStandId))
+            .where(eq(routes.status, 'approved'));
 
         const routesWithStops = await Promise.all(
             allRoutes.map(async (route) => {

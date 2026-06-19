@@ -48,6 +48,15 @@ async function main() {
     `);
 
         console.log('✅ Tables created successfully!');
+
+        console.log('🔄 Applying migrations...');
+        try {
+            await db.execute(sql`ALTER TABLE stands ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected'))`);
+            await db.execute(sql`ALTER TABLE routes ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected'))`);
+            console.log('✅ Migrations applied successfully!');
+        } catch (e) {
+            console.log('⚠️ Migration note: Columns might already exist or another error occurred:', e);
+        }
     } catch (error) {
         console.error('❌ Error creating tables:', error);
     }

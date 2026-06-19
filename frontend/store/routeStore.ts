@@ -21,6 +21,9 @@ interface RouteStore {
     setUserLocation: (location: { lat: number; lng: number } | null) => void;
     setNearbyRoutes: (routes: any[]) => void;
     setShowMap: (show: boolean) => void;
+    
+    tripPlan: any | null;
+    setTripPlan: (plan: any | null) => void;
 }
 
 export const useRouteStore = create<RouteStore>((set) => ({
@@ -41,4 +44,7 @@ export const useRouteStore = create<RouteStore>((set) => ({
     setUserLocation: (location) => set({ userLocation: location }),
     setNearbyRoutes: (routes) => set({ nearbyRoutes: routes }),
     setShowMap: (show) => set({ showMap: show }),
+    
+    tripPlan: null,
+    setTripPlan: (plan) => set({ tripPlan: plan }),
 }));

@@ -8,6 +8,8 @@ import https from 'https';
 import http from 'http';
 import contributorRoutes from './routes/contributor.js';
 import { apiLimiter } from './middleware/rateLimiter.js';
+import adminRoutes from './routes/admin.js';
+import plannerRoutes from './routes/planner.js';
 
 const app = express();
 
@@ -24,6 +26,8 @@ app.get('/ping', (req, res) => {
 app.use('/api', apiLimiter);
 
 app.use('/api/contributor', contributorRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/planner', plannerRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
@@ -44,4 +48,4 @@ if (RENDER_URL) {
     });
 } else {
     console.log('RENDER_EXTERNAL_URL not set, skipping keep-alive cron job.');
-}
+}

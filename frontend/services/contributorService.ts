@@ -19,7 +19,7 @@ export type RouteData = {
 
 // Pass the auth token here if the backend requires authentication
 export async function getStands() {
-    const res = await fetch(`${BASE_URL}/stands`);
+    const res = await fetch(`${BASE_URL}/stands`, { cache: 'no-store' });
     if (!res.ok) throw new Error('Failed to fetch stands');
     return res.json();
 }
@@ -45,13 +45,13 @@ export async function addStand(data: StandData, token?: string) {
 }
 
 export async function getRoutes() {
-    const res = await fetch(`${BASE_URL}/routes`);
+    const res = await fetch(`${BASE_URL}/routes`, { cache: 'no-store' });
     if (!res.ok) throw new Error('Failed to fetch routes');
     return res.json();
 }
 
 export async function getNearbyRoutes(lat: number, lng: number, radius = 1) {
-    const res = await fetch(`${BASE_URL}/routes/nearby?lat=${lat}&lng=${lng}&radius=${radius}`);
+    const res = await fetch(`${BASE_URL}/routes/nearby?lat=${lat}&lng=${lng}&radius=${radius}`, { cache: 'no-store' });
     if (!res.ok) throw new Error('Failed to fetch nearby routes');
     return res.json();
 }

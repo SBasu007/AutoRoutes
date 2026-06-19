@@ -8,6 +8,7 @@ export const stands = pgTable('stands', {
     lng: doublePrecision('lng').notNull(),
     address: text('address'),
     type: text('type', { enum: ['auto_stand', 'destination', 'stop'] }).default('auto_stand'),
+    status: text('status', { enum: ['pending', 'approved', 'rejected'] }).default('pending'),
     addedBy: text('added_by').notNull(), // clerk user id
     createdAt: timestamp('created_at').defaultNow(),
 });
@@ -19,6 +20,7 @@ export const routes = pgTable('routes', {
     name: text('name'), // e.g. "Ballygunge to Howrah"
     path: text('path'), // JSON stringified array of {lat, lng} points for polyline
     estimatedTimeMin: integer('estimated_time_min'),
+    status: text('status', { enum: ['pending', 'approved', 'rejected'] }).default('pending'),
     addedBy: text('added_by').notNull(),
     createdAt: timestamp('created_at').defaultNow(),
 });

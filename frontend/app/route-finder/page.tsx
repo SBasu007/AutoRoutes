@@ -1,13 +1,12 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Sidebar from "../../components/sidebar/Sidebar";
-import NearbyRoutesList from "@/components/route/NearbyRoutesList";
-import HorizontalRouteSlider from "@/components/route/HorizontalRouteSlider";
+import TripPlannerPanel from "@/components/route/TripPlannerPanel";
 import { useRouteStore } from "@/store/routeStore";
-import { getRoutes, getNearbyRoutes } from "@/services/contributorService";
-import { ArrowLeft } from "lucide-react";
+import { getRoutes } from "@/services/contributorService";
+import { ChevronUp } from "lucide-react";
 
 const MapView = dynamic(
     () => import("@/components/map/MapView"),
@@ -15,7 +14,8 @@ const MapView = dynamic(
 );
 
 export default function RouteFinderPage() {
-    const { setAllRoutes, setUserLocation, setNearbyRoutes, showMap, setShowMap } = useRouteStore();
+    const { setAllRoutes } = useRouteStore();
+    const [isPanelOpen, setIsPanelOpen] = useState(true);
 
     useEffect(() => {
         const fetchAllRoutes = async () => {
@@ -28,56 +28,47 @@ export default function RouteFinderPage() {
         };
 
         fetchAllRoutes();
-
-        // Get user location
-        if ("geolocation" in navigator) {
-            navigator.geolocation.getCurrentPosition(
-                async (position) => {
-                    const lat = position.coords.latitude;
-                    const lng = position.coords.longitude;
-                    setUserLocation({ lat, lng });
-
-                    try {
-                        const nearby = await getNearbyRoutes(lat, lng, 1);
-                        setNearbyRoutes(nearby);
-                    } catch (err) {
-                        console.error("Failed to fetch nearby routes", err);
-                    }
-                },
-                (error) => {
-                    console.error("Error getting location", error);
-                }
-            );
-        }
-    }, [setAllRoutes, setUserLocation, setNearbyRoutes]);
+    }, [setAllRoutes]);
 
     return (
-        <div className="h-screen flex bg-white overflow-hidden">
+        <div className="h-screen flex bg-gray-50 overflow-hidden text-black font-sans">
             <Sidebar />
 
-            <div className="relative flex-1 h-full flex flex-col">
-                {!showMap ? (
-                    <NearbyRoutesList />
-                ) : (
-                    <>
-                        {/* Map View Mode */}
-                        <div className="absolute top-4 left-4 z-[1001]">
-                            <button
-                                onClick={() => setShowMap(false)}
-                                className="flex items-center gap-2 bg-white/95 backdrop-blur shadow-md px-4 py-2 rounded-full font-semibold text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                            >
-                                <ArrowLeft className="w-4 h-4" />
-                                Back to List
-                            </button>
-                        </div>
-                        
-                        <HorizontalRouteSlider />
+            <div className="flex-1 flex flex-col relative w-full h-full overflow-hidden">
+                <div className="flex-1 flex flex-col md:flex-row relative overflow-hidden">
+                    {/* Map Area */}
+                    <div className="absolute inset-0 md:relative md:flex-1 h-full z-0">
+                        <MapView />
+                    </div>
 
-                        <div className="flex-1 w-full relative">
-                            <MapView />
+                    {/* Mobile Panel Toggle */}
+                    <button 
+                        onClick={() => setIsPanelOpen(!isPanelOpen)}
+                        className={`md:hidden absolute z-[1000] bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-3 flex justify-center items-center shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] transition-transform duration-300 ${isPanelOpen ? 'translate-y-full opacity-0' : 'translate-y-0 opacity-100'}`}
+                    >
+                        <ChevronUp className="text-gray-600 mr-2" />
+                        <span className="font-semibold text-gray-800">Open Trip Planner</span>
+                    </button>
+
+                    {/* Interactive Panel */}
+                    <div 
+                        className={`absolute md:relative z-[1000] md:z-10 bottom-0 left-0 right-0 md:w-[450px] bg-white md:border-l border-gray-200 shadow-2xl md:shadow-none flex flex-col transition-transform duration-300 ease-in-out
+                            ${isPanelOpen ? 'translate-y-0' : 'translate-y-full md:translate-y-0'}
+                            h-[80vh] md:h-full rounded-t-3xl md:rounded-none overflow-hidden`}
+                    >
+                        {/* Mobile Drag Handle */}
+                        <div 
+                            className="md:hidden flex justify-center items-center p-3 cursor-pointer shrink-0 bg-white"
+                            onClick={() => setIsPanelOpen(false)}
+                        >
+                            <div className="w-12 h-1.5 bg-gray-300 rounded-full"></div>
                         </div>
-                    </>
-                )}
+
+                        <div className="flex-1 overflow-y-auto">
+                            <TripPlannerPanel />
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     );
