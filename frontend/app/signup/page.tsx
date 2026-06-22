@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useAuthStore } from "../../store/authStore";
 import Sidebar from "../../components/sidebar/Sidebar";
 import { UserPlus, Mail, Lock, User, AlertCircle } from "lucide-react";
 
-export default function SignupPage() {
+function SignupPageInner() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const redirectUrl = searchParams.get("redirect") || "/contributor";
@@ -184,5 +184,13 @@ export default function SignupPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function SignupPage() {
+    return (
+        <Suspense fallback={<div className="h-screen bg-gray-50" />}>
+            <SignupPageInner />
+        </Suspense>
     );
 }

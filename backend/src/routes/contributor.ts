@@ -329,7 +329,7 @@ router.get('/me/history', authenticate, async (req, res) => {
             // actually let's just do it in JS or just no order. No wait, let's sort in JS since it's safer than dealing with missing desc import.
             // Oh wait, `contributions` doesn't have an explicit order if we don't use desc. I will just fetch and sort.
             ;
-        history.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        history.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
         res.json(history);
     } catch (err: any) {
         res.status(500).json({ error: err.message });
