@@ -317,5 +317,23 @@ router.get('/routes/nearby', async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
+// Get User's Contribution History
+router.get('/me/history', authenticate, async (req, res) => {
+    try {
+        const userId = req.auth!.userId;
+        const history = await db.select()
+            .from(contributions)
+            .where(eq(contributions.addedBy, userId))
+            // using order by creation date desc requires importing `desc` from drizzle-orm, 
+            // since it might not be imported, I'll fetch and sort in memory if needed,
+            // actually let's just do it in JS or just no order. No wait, let's sort in JS since it's safer than dealing with missing desc import.
+            // Oh wait, `contributions` doesn't have an explicit order if we don't use desc. I will just fetch and sort.
+            ;
+        history.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        res.json(history);
+    } catch (err: any) {
+        res.status(500).json({ error: err.message });
+    }
+});
 
 export default router;

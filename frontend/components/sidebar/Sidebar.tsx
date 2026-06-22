@@ -1,15 +1,22 @@
 "use client";
 
+import { Suspense } from "react";
 import Link from "next/link";
 import { Map, Users, User, LogOut } from "lucide-react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useAuthStore } from "../../store/authStore";
 
-export default function Sidebar() {
+function SidebarInner() {
     const pathname = usePathname();
     const router = useRouter();
+    const searchParams = useSearchParams();
     const { isAuthenticated, user, logout } = useAuthStore();
     const showContributor = process.env.NEXT_PUBLIC_SHOW_CONTRIBUTOR === "true";
+
+    const redirectParam = searchParams.get("redirect");
+    const effectivePath = (pathname === "/login" || pathname === "/signup")
+        ? (redirectParam || "/contributor")
+        : pathname;
 
     const menu = [
         {
@@ -46,8 +53,7 @@ export default function Sidebar() {
                 <nav className="p-4 space-y-2" aria-label="Navigation menu">
                     {menu.map((item) => {
                         const Icon = item.icon;
-                        const isContributorActive = pathname === "/contributor" || pathname === "/login" || pathname === "/signup";
-                        const active = item.href === "/contributor" ? isContributorActive : pathname === item.href;
+                        const active = effectivePath === item.href;
 
                         return (
                             <Link
@@ -133,8 +139,7 @@ export default function Sidebar() {
                     <div className="grid grid-cols-3 gap-1">
                         {menu.map((item) => {
                             const Icon = item.icon;
-                            const isContributorActive = pathname === "/contributor" || pathname === "/login" || pathname === "/signup";
-                            const active = item.href === "/contributor" ? isContributorActive : pathname === item.href;
+                            const active = effectivePath === item.href;
 
                             return (
                                 <Link
@@ -174,5 +179,15 @@ export default function Sidebar() {
                 </div>
             </nav>
         </>
+    );
+}
+
+export default function Sidebar() {
+    return (
+        <Suspense fallback={
+            <aside className="hidden md:flex w-72 bg-white border-r flex-col" />
+        }>
+            <SidebarInner />
+        </Suspense>
     );
 }

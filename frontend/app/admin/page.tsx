@@ -2,11 +2,17 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 import { useAdminStore } from "../../store/adminStore";
 import {
     ShieldCheck, LogOut, CheckCircle, XCircle, Clock,
     MapPin, Route, RefreshCw, ChevronDown, ChevronUp, AlertCircle
 } from "lucide-react";
+
+const AdminMapPreview = dynamic(
+    () => import("../../components/admin/AdminMapPreview"),
+    { ssr: false, loading: () => <div className="h-64 w-full bg-gray-900 animate-pulse rounded-xl my-3 border border-white/10" /> }
+);
 
 interface Contribution {
     id: number;
@@ -108,7 +114,7 @@ export default function AdminDashboard() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-950 text-white font-sans">
+        <div className="h-screen overflow-y-auto bg-gray-950 text-white font-sans">
             {/* Top Bar */}
             <header className="bg-gray-900 border-b border-white/10 px-6 py-4 flex items-center justify-between sticky top-0 z-50">
                 <div className="flex items-center gap-3">
@@ -220,6 +226,9 @@ export default function AdminDashboard() {
                                     {/* Expanded details */}
                                     {isExpanded && (
                                         <div className="px-4 sm:px-5 pb-5 border-t border-white/5 pt-4 space-y-4">
+                                            {/* Map Preview */}
+                                            <AdminMapPreview type={type as "stand" | "route"} payload={type === "stand" ? c.standPayload : c.routePayload} />
+
                                             {/* Payload preview */}
                                             <div className="bg-gray-900/60 rounded-xl p-4 overflow-x-auto">
                                                 <p className="text-xs font-bold text-gray-500 uppercase mb-2">Payload</p>

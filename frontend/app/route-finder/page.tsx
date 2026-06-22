@@ -13,6 +13,11 @@ const MapView = dynamic(
     { ssr: false }
 );
 
+const FloatingProfile = dynamic(
+    () => import("@/components/ui/FloatingProfile"),
+    { ssr: false }
+);
+
 export default function RouteFinderPage() {
     const { setAllRoutes } = useRouteStore();
     const [isPanelOpen, setIsPanelOpen] = useState(true);
@@ -39,6 +44,7 @@ export default function RouteFinderPage() {
                     {/* Map Area */}
                     <div className="absolute inset-0 md:relative md:flex-1 h-full z-0">
                         <MapView />
+                        <FloatingProfile />
                     </div>
 
                     {/* Mobile Panel Toggle */}
