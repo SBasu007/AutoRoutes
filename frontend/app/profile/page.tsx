@@ -13,12 +13,14 @@ export default function ProfilePage() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        if (!showContributor) return;
+
         if (!isAuthenticated) {
             router.push("/login?redirect=/profile");
         } else {
             setLoading(false);
         }
-    }, [isAuthenticated, router]);
+    }, [isAuthenticated, router, showContributor]);
 
     if (!showContributor) {
         return <ProfileComingSoon />;
