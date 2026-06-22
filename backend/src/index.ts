@@ -10,6 +10,7 @@ import contributorRoutes from './routes/contributor.js';
 import { apiLimiter } from './middleware/rateLimiter.js';
 import adminRoutes from './routes/admin.js';
 import plannerRoutes from './routes/planner.js';
+import authRoutes from './routes/auth.js';
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.get('/ping', (req, res) => {
 // Apply rate limiter to all API endpoints
 app.use('/api', apiLimiter);
 
+app.use('/api/auth', authRoutes);
 app.use('/api/contributor', contributorRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/planner', plannerRoutes);

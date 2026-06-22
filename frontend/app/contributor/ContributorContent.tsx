@@ -3,9 +3,11 @@
 import Sidebar from "../../components/sidebar/Sidebar";
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
 import { getStands, getRoutes, addStand as addStandService, addRoute as addRouteService } from "../../services/contributorService";
-import { MapPin, Route as RouteIcon, Save, ArrowRight, ArrowLeft, ChevronUp, ChevronDown, Plus, Trash2 } from "lucide-react";
+import { MapPin, Route as RouteIcon, Save, ArrowRight, ArrowLeft, ChevronUp, ChevronDown, Plus, Trash2, LogOut, User } from "lucide-react";
 import SearchableSelect from "../../components/ui/SearchableSelect";
+import { useAuthStore } from "../../store/authStore";
 
 const Map = dynamic(() => import("../../components/contributor/ContributorMap"), { ssr: false });
 
@@ -38,8 +40,15 @@ type RouteType = {
 };
 
 export default function ContributorPage() {
+    const { token, user, logout } = useAuthStore();
+    const router = useRouter();
     const [stands, setStands] = useState<Stand[]>([]);
     const [routes, setRoutes] = useState<RouteType[]>([]);
+
+    const handleLogout = () => {
+        logout();
+        router.push("/login");
+    };
 
     // Step 1: Manage Stands, Step 2: Create Route
     const [step, setStep] = useState<1 | 2>(1);
@@ -136,7 +145,7 @@ export default function ContributorPage() {
                 ...newStand,
                 lat: tempMarker.lat,
                 lng: tempMarker.lng,
-            });
+            }, token || undefined);
             alert("Stand added! An admin will review it shortly.");
             setNewStand({ name: "", type: "auto_stand", address: "" });
             setTempMarker(null);
@@ -158,7 +167,7 @@ export default function ContributorPage() {
                 name: routeName || `${stands.find(s => s.id === selectedFrom)?.name} → ${stands.find(s => s.id === selectedTo)?.name}`,
                 path: routePath,
                 estimatedTimeMin: estimatedTime,
-            });
+            }, token || undefined);
             alert("Route created! An admin will review it shortly.");
             setSelectedFrom(null);
             setSelectedTo(null);
@@ -177,18 +186,36 @@ export default function ContributorPage() {
 
             <div className="flex-1 flex flex-col relative w-full h-full overflow-hidden">
                 {/* Header */}
-                <div className="bg-white border-b shadow-sm p-4 md:p-6 flex items-center justify-between z-10 shrink-0">
+                <div className="bg-white border-b shadow-sm px-6 py-4 flex items-center justify-between z-10 shrink-0">
                     <div>
                         <h1 className="text-xl md:text-2xl font-extrabold text-gray-900 tracking-tight">Contributor Panel</h1>
                         <p className="text-sm text-gray-500 hidden md:block">Help build the Kolkata Auto Routes network</p>
                     </div>
-                    {/* Mobile Hamburger to reopen panel */}
-                    <button
-                        onClick={() => setIsPanelOpen(true)}
-                        className="md:hidden flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg font-semibold text-sm hover:bg-blue-100 transition-colors"
-                    >
-                        <ChevronUp size={16} />Open  Panel
-                    </button>
+
+                    <div className="flex items-center gap-3">
+                        {user && (
+                            <div className="hidden sm:flex items-center gap-2 px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm">
+                                <User size={16} className="text-gray-500" />
+                                <span className="font-semibold text-gray-700">{user.username}</span>
+                            </div>
+                        )}
+
+                        <button
+                            onClick={handleLogout}
+                            className="flex items-center gap-2 px-4 py-2 bg-white border border-red-200 text-red-600 rounded-xl font-bold text-sm hover:bg-red-50 active:bg-red-100 transition-all shadow-sm cursor-pointer"
+                        >
+                            <LogOut size={16} />
+                            <span className="xs:inline">Logout</span>
+                        </button>
+
+                        {/* Mobile Hamburger to reopen panel */}
+                        <button
+                            onClick={() => setIsPanelOpen(true)}
+                            className="md:hidden flex items-center gap-2 px-3 py-2 bg-blue-50 text-blue-700 rounded-xl font-semibold text-sm hover:bg-blue-100 transition-colors"
+                        >
+                            <ChevronUp size={16} />Open Panel
+                        </button>
+                    </div>
                 </div>
 
                 <div className="flex-1 flex flex-col md:flex-row relative overflow-hidden">

@@ -8,6 +8,30 @@ async function main() {
     console.log('🚀 Creating tables...');
     try {
         await db.execute(sql `
+      CREATE TABLE IF NOT EXISTS users (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        username TEXT UNIQUE NOT NULL,
+        email TEXT UNIQUE NOT NULL,
+        password_hash TEXT NOT NULL,
+        role TEXT DEFAULT 'contributor',
+        created_at TIMESTAMP DEFAULT NOW()
+      );
+    `);
+        await db.execute(sql `
+      CREATE TABLE IF NOT EXISTS contributions (
+        id SERIAL PRIMARY KEY,
+        stand_payload JSONB,
+        route_payload JSONB,
+        route_stops_payload JSONB,
+        status TEXT DEFAULT 'pending',
+        added_by UUID REFERENCES users(id),
+        reviewed_by UUID REFERENCES users(id),
+        review_notes TEXT,
+        created_at TIMESTAMP DEFAULT NOW(),
+        reviewed_at TIMESTAMP
+      );
+    `);
+        await db.execute(sql `
       CREATE TABLE IF NOT EXISTS stands (
         id SERIAL PRIMARY KEY,
         name TEXT NOT NULL,
@@ -41,6 +65,15 @@ async function main() {
       );
     `);
         console.log('✅ Tables created successfully!');
+        console.log('🔄 Applying migrations...');
+        try {
+            await db.execute(sql `ALTER TABLE stands ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected'))`);
+            await db.execute(sql `ALTER TABLE routes ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected'))`);
+            console.log('✅ Migrations applied successfully!');
+        }
+        catch (e) {
+            console.log('⚠️ Migration note: Columns might already exist or another error occurred:', e);
+        }
     }
     catch (error) {
         console.error('❌ Error creating tables:', error);

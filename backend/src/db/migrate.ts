@@ -2,7 +2,6 @@ import 'dotenv/config';
 import { neon } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-http';
 import { sql } from 'drizzle-orm';
-import { stands, routes } from './schema.js';
 
 const client = neon(process.env.DATABASE_URL!);
 const db = drizzle(client);
@@ -11,6 +10,32 @@ async function main() {
     console.log('🚀 Creating tables...');
 
     try {
+        await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS users (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        username TEXT UNIQUE NOT NULL,
+        email TEXT UNIQUE NOT NULL,
+        password_hash TEXT NOT NULL,
+        role TEXT DEFAULT 'contributor',
+        created_at TIMESTAMP DEFAULT NOW()
+      );
+    `);
+
+        await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS contributions (
+        id SERIAL PRIMARY KEY,
+        stand_payload JSONB,
+        route_payload JSONB,
+        route_stops_payload JSONB,
+        status TEXT DEFAULT 'pending',
+        added_by UUID REFERENCES users(id),
+        reviewed_by UUID REFERENCES users(id),
+        review_notes TEXT,
+        created_at TIMESTAMP DEFAULT NOW(),
+        reviewed_at TIMESTAMP
+      );
+    `);
+
         await db.execute(sql`
       CREATE TABLE IF NOT EXISTS stands (
         id SERIAL PRIMARY KEY,

@@ -1,11 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { Map, Users, User } from "lucide-react";
-import { usePathname } from "next/navigation";
+import { Map, Users, User, LogOut } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { useAuthStore } from "../../store/authStore";
 
 export default function Sidebar() {
     const pathname = usePathname();
+    const router = useRouter();
+    const { isAuthenticated, user, logout } = useAuthStore();
     const showContributor = process.env.NEXT_PUBLIC_SHOW_CONTRIBUTOR === "true";
 
     const menu = [
@@ -43,6 +46,8 @@ export default function Sidebar() {
                 <nav className="p-4 space-y-2" aria-label="Navigation menu">
                     {menu.map((item) => {
                         const Icon = item.icon;
+                        const isContributorActive = pathname === "/contributor" || pathname === "/login" || pathname === "/signup";
+                        const active = item.href === "/contributor" ? isContributorActive : pathname === item.href;
 
                         return (
                             <Link
@@ -51,7 +56,7 @@ export default function Sidebar() {
                                 title={item.ariaLabel}
                                 aria-label={item.ariaLabel}
                                 className={`flex items-center gap-3 p-3 rounded-xl transition
-                                ${pathname === item.href
+                                ${active
                                         ? "bg-blue-500 text-white"
                                         : "text-black hover:bg-gray-100"
                                     }`}
@@ -62,6 +67,30 @@ export default function Sidebar() {
                         );
                     })}
                 </nav>
+
+                {/* {isAuthenticated && user && (
+                    <div className="p-4 border-t bg-gray-50 flex flex-col gap-2">
+                        <div className="flex items-center gap-3">
+                            <div className="w-9 h-9 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold text-sm uppercase">
+                                {user.username.slice(0, 2)}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <p className="text-sm font-semibold text-gray-900 truncate">{user.username}</p>
+                                <p className="text-xs text-gray-500 truncate">{user.role}</p>
+                            </div>
+                        </div>
+                        <button
+                            onClick={() => {
+                                logout();
+                                router.push("/login");
+                            }}
+                            className="mt-1 w-full flex items-center justify-center gap-2 p-2 border border-red-200 text-red-600 hover:bg-red-50 active:bg-red-100 rounded-xl text-xs font-bold transition cursor-pointer"
+                        >
+                            <LogOut size={14} />
+                            Logout
+                        </button>
+                    </div>
+                )} */}
 
                 <div className="mt-auto p-4 border-t text-xs text-gray-500">
                     <p className="font-semibold mb-2">Popular Searches:</p>
@@ -104,7 +133,8 @@ export default function Sidebar() {
                     <div className="grid grid-cols-3 gap-1">
                         {menu.map((item) => {
                             const Icon = item.icon;
-                            const active = pathname === item.href;
+                            const isContributorActive = pathname === "/contributor" || pathname === "/login" || pathname === "/signup";
+                            const active = item.href === "/contributor" ? isContributorActive : pathname === item.href;
 
                             return (
                                 <Link

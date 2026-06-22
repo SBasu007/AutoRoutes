@@ -8,6 +8,9 @@ import https from 'https';
 import http from 'http';
 import contributorRoutes from './routes/contributor.js';
 import { apiLimiter } from './middleware/rateLimiter.js';
+import adminRoutes from './routes/admin.js';
+import plannerRoutes from './routes/planner.js';
+import authRoutes from './routes/auth.js';
 const app = express();
 app.use(helmet());
 app.use(cors({ origin: process.env.FRONTEND_URL || 'http://localhost:3000' }));
@@ -18,7 +21,10 @@ app.get('/ping', (req, res) => {
 });
 // Apply rate limiter to all API endpoints
 app.use('/api', apiLimiter);
+app.use('/api/auth', authRoutes);
 app.use('/api/contributor', contributorRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/planner', plannerRoutes);
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);

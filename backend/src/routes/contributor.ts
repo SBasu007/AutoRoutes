@@ -1,10 +1,11 @@
 // src/routes/contributor.ts
 import { Router } from 'express';
 import { db } from '../db/index.js';
-import { stands, routes, routeStops } from '../db/schema.js';
+import { stands, routes, routeStops, contributions } from '../db/schema.js';
 import { asc, eq } from 'drizzle-orm';
 import { z } from 'zod';
 import { alias } from 'drizzle-orm/pg-core';
+import { authenticate } from '../middleware/auth.js';
 const router = Router();
 
 function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
@@ -30,98 +31,102 @@ const standSchema = z.object({
 const routeSchema = z.object({
     fromStandId: z.number(),
     toStandId: z.number(),
-
     name: z.string().optional(),
-
     estimatedTimeMin: z.number().optional(),
-
     path: z.array(
         z.object({
             lat: z.number(),
             lng: z.number(),
         })
     ),
-
     stops: z.array(z.number()).default([]),
 });
 
-// Add new Stand
-router.post('/stands', async (req, res) => {
+// Submit new Stand as a contribution
+router.post('/stands', authenticate, async (req, res) => {
     try {
         const data = standSchema.parse(req.body);
-        const result = await db.insert(stands).values({
-            ...data,
-            addedBy: 'anonymous',
+        const userId = req.auth!.userId;
+
+        // Build stand payload matching the stands table columns
+        const standPayload = {
+            name: data.name,
+            lat: data.lat,
+            lng: data.lng,
+            address: data.address ?? null,
+            type: data.type,
+            added_by: userId,
+        };
+
+        const result = await db.insert(contributions).values({
+            standPayload,
+            routePayload: null,
+            routeStopsPayload: null,
             status: 'pending',
+            addedBy: userId,
         }).returning();
 
-        res.status(201).json(result[0]);
+        res.status(201).json({
+            contributionId: result[0].id,
+            message: 'Stand submitted for review. An admin will approve it shortly.',
+        });
     } catch (err: any) {
         res.status(400).json({ error: err.message });
     }
 });
 
-// Get All Stands
+// Get All Approved Stands
 router.get('/stands', async (req, res) => {
     const allStands = await db.select().from(stands).where(eq(stands.status, 'approved'));
     res.json(allStands);
 });
 
-// Add Route
-router.post('/routes', async (req, res) => {
+// Submit new Route (and its stops) as a contribution
+router.post('/routes', authenticate, async (req, res) => {
     try {
         const data = routeSchema.parse(req.body);
+        const userId = req.auth!.userId;
 
-        const routeResult =
-            await db.insert(routes)
-                .values({
-                    fromStandId: data.fromStandId,
-                    toStandId: data.toStandId,
+        // Build route payload matching the routes table columns
+        const routePayload = {
+            from_stand_id: data.fromStandId,
+            to_stand_id: data.toStandId,
+            name: data.name ?? null,
+            path: JSON.stringify(data.path),
+            estimated_time_min: data.estimatedTimeMin ?? null,
+            added_by: userId,
+        };
 
-                    name: data.name,
-
-                    estimatedTimeMin:
-                        data.estimatedTimeMin,
-
-                    path: JSON.stringify(data.path),
-
-                    addedBy: 'anonymous',
-                    status: 'pending',
-                })
-                .returning();
-
-        const route =
-            routeResult[0];
-
-        const orderedStops = [
+        // Build route_stops payload: ordered list of stand IDs
+        const orderedStopIds = [
             data.fromStandId,
             ...data.stops,
             data.toStandId,
         ];
 
-        if (orderedStops.length > 0) {
-            await db.insert(routeStops)
-                .values(
-                    orderedStops.map(
-                        (standId, index) => ({
-                            routeId: route.id,
-                            standId,
-                            stopOrder: index + 1,
-                        })
-                    )
-                );
-        }
+        const routeStopsPayload = orderedStopIds.map((standId, index) => ({
+            stand_id: standId,
+            stop_order: index + 1,
+        }));
 
-        res.status(201).json(route);
+        const result = await db.insert(contributions).values({
+            standPayload: null,
+            routePayload,
+            routeStopsPayload,
+            status: 'pending',
+            addedBy: userId,
+        }).returning();
 
-    } catch (err: any) {
-        res.status(400).json({
-            error: err.message,
+        res.status(201).json({
+            contributionId: result[0].id,
+            message: 'Route submitted for review. An admin will approve it shortly.',
         });
+    } catch (err: any) {
+        res.status(400).json({ error: err.message });
     }
 });
 
-// Get All Routes with proper joins
+// Get All Approved Routes with proper joins
 router.get('/routes', async (req, res) => {
 
     const fromStand =
