@@ -1,7 +1,9 @@
 const BASE_URL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/planner`;
 
-export type TripLeg = 
-  | { type: 'walk', instruction: string, distanceKm: number }
+export type GeoPoint = { lat: number; lng: number };
+
+export type TripLeg =
+  | { type: 'walk', instruction: string, distanceKm: number, from: GeoPoint, to: GeoPoint }
   | { type: 'auto', instruction: string, routeId: number, fromStand: any, toStand: any };
 
 export type TripPlan = {
@@ -9,6 +11,8 @@ export type TripPlan = {
     message: string;
     totalDistanceKm: number;
     legs: TripLeg[];
+    origin?: GeoPoint;
+    destination?: GeoPoint;
     error?: string;
 };
 
