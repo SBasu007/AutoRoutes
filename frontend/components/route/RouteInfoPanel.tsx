@@ -9,7 +9,7 @@ export default function RouteInfoPanel() {
 
     return (
         <div className="w-full md:w-[350px] bg-white rounded-2xl shadow-xl border border-gray-200 p-4 md:p-5 relative">
-            <button 
+            <button
                 onClick={() => setSelectedRoute(null)}
                 className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 font-bold"
             >
@@ -42,7 +42,7 @@ export default function RouteInfoPanel() {
                         </span>
                     </div>
                 )}
-                
+
                 {selectedRoute.stops && selectedRoute.stops.length > 0 && (
                     <div className="mt-2 pt-2 border-t">
                         <span className="text-black font-medium block mb-2">

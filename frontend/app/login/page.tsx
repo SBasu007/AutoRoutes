@@ -11,9 +11,9 @@ function LoginPageInner() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const redirectUrl = searchParams.get("redirect") || "/contributor";
-    
+
     const { login } = useAuthStore();
-    
+
     const [identifier, setIdentifier] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");

@@ -46,7 +46,7 @@ export default function FloatingProfile() {
                         <p className="text-sm font-semibold text-gray-900 truncate">{user.username}</p>
                         <p className="text-xs text-gray-500 truncate">{user.email}</p>
                     </div>
-                    
+
                     <div className="p-1">
                         <button
                             onClick={handleLogout}

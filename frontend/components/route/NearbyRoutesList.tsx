@@ -48,27 +48,26 @@ export default function NearbyRoutesList() {
                                     setSelectedRoute(route);
                                     setShowMap(true);
                                 }}
-                                className={`w-full text-left p-5 rounded-[24px] transition-all duration-300 group bg-white border hover:-translate-y-1 ${
-                                    selectedRoute?.id === route.id
+                                className={`w-full text-left p-5 rounded-[24px] transition-all duration-300 group bg-white border hover:-translate-y-1 ${selectedRoute?.id === route.id
                                         ? "border-blue-500 shadow-[0_8px_24px_rgba(59,130,246,0.2)] ring-4 ring-blue-500/10"
                                         : "border-gray-100 hover:border-blue-200 hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)]"
-                                }`}
+                                    }`}
                             >
                                 <h3 className={`font-bold text-lg mb-4 truncate ${selectedRoute?.id === route.id ? 'text-blue-600' : 'text-gray-900 group-hover:text-blue-600'}`}>
                                     {route.name || "Auto Route"}
                                 </h3>
-                                
+
                                 <div className="flex flex-col gap-3 relative mb-5">
                                     {/* Vertical line connecting the dots */}
                                     <div className="absolute left-[7px] top-[14px] bottom-[14px] w-0.5 rounded-full bg-gray-100 group-hover:bg-blue-100 transition-colors" />
-                                    
+
                                     <div className="flex items-center gap-3">
                                         <div className="w-4 h-4 rounded-full bg-blue-500 flex-shrink-0 z-10 ring-4 ring-white shadow-sm" />
                                         <span className="text-sm font-semibold text-gray-700 truncate group-hover:text-gray-900 transition-colors">
                                             {route.from?.name || "Start Point"}
                                         </span>
                                     </div>
-                                    
+
                                     <div className="flex items-center gap-3">
                                         <div className="w-4 h-4 rounded-full bg-red-500 flex-shrink-0 z-10 ring-4 ring-white shadow-sm" />
                                         <span className="text-sm font-semibold text-gray-700 truncate group-hover:text-gray-900 transition-colors">
@@ -78,11 +77,10 @@ export default function NearbyRoutesList() {
                                 </div>
 
                                 {route.estimatedTimeMin && (
-                                    <div className={`flex items-center gap-1.5 text-xs font-bold w-fit px-3 py-2 rounded-xl transition-colors ${
-                                        selectedRoute?.id === route.id 
-                                            ? 'bg-blue-50 text-blue-600' 
+                                    <div className={`flex items-center gap-1.5 text-xs font-bold w-fit px-3 py-2 rounded-xl transition-colors ${selectedRoute?.id === route.id
+                                            ? 'bg-blue-50 text-blue-600'
                                             : 'bg-gray-50 text-gray-500 group-hover:bg-blue-50 group-hover:text-blue-600'
-                                    }`}>
+                                        }`}>
                                         <Clock className="w-4 h-4" />
                                         <span>~{route.estimatedTimeMin} mins</span>
                                     </div>

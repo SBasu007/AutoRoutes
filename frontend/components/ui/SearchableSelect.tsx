@@ -19,7 +19,7 @@ export default function SearchableSelect({ options, value, onChange, placeholder
     const [searchTerm, setSearchTerm] = useState('');
     const debouncedSearchTerm = useDebounce(searchTerm, 300);
     const [filteredOptions, setFilteredOptions] = useState<Option[]>(options);
-    
+
     const wrapperRef = useRef<HTMLDivElement>(null);
 
     // Sync selected value to the search term when dropdown is closed
