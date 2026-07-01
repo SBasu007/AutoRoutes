@@ -40,3 +40,69 @@ body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* ── Trip markers (Uber/Rapido style) ─────────────────────────────────── */
+
+/* CRITICAL: Leaflet's .leaflet-div-icon gets a white bg + gray border by
+   default. We MUST clear it on ALL custom markers, otherwise our icons
+   are hidden inside an opaque white box. */
+.leaflet-div-icon.trip-origin-marker,
+.leaflet-div-icon.trip-dest-marker,
+.leaflet-div-icon.trip-stop-marker {
+    background: transparent;
+    border: none;
+}
+
+/* Origin — glowing green dot for user location */
+.trip-origin-marker .origin-dot-wrap {
+    position: relative;
+    width: 24px;
+    height: 24px;
+}
+.trip-origin-marker .origin-pulse {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: rgba(34, 197, 94, 0.4);
+    animation: origin-pulse 2s ease-out infinite;
+}
+.trip-origin-marker .origin-dot {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #22c55e;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+@keyframes origin-pulse {
+    0%   { transform: scale(0.8); opacity: 0.8; }
+    100% { transform: scale(2.4); opacity: 0; }
+}
+
+/* Destination — red pin (SVG already styled) */
+.trip-dest-marker { background: transparent; }
+
+/* Intermediate stop — small numbered blue circle */
+.trip-stop-marker .stop-circle {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #4f46e5;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid #fff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+/* Keep custom marker icons above leaflet tiles */
+.trip-origin-marker,
+.trip-dest-marker,
+.trip-stop-marker { z-index: 600 !important; }

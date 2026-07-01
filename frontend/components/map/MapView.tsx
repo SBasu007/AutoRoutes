@@ -24,9 +24,23 @@ function MapUpdater() {
         source,
         destination,
         selectedRoute,
+        tripPlan,
     } = useRouteStore();
 
     useEffect(() => {
+        // 1. Trip planned — frame origin → destination (covers whole journey)
+        if (tripPlan && tripPlan.origin && tripPlan.destination) {
+            map.fitBounds(
+                [
+                    [tripPlan.origin.lat, tripPlan.origin.lng],
+                    [tripPlan.destination.lat, tripPlan.destination.lng],
+                ],
+                { padding: [80, 80], maxZoom: 15 }
+            );
+            return;
+        }
+
+        // 2. A route was clicked in explore mode
         if (selectedRoute) {
             let path = [];
             try {
@@ -56,7 +70,7 @@ function MapUpdater() {
                 }
             );
         }
-    }, [source, destination, selectedRoute, map]);
+    }, [source, destination, selectedRoute, tripPlan, map]);
 
     return null;
 }

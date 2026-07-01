@@ -10,7 +10,7 @@ declare global {
     }
 }
 
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_for_development_change_in_prod';
+const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_for_development';
 
 export const authenticate = async (req: Request, res: Response, next: NextFunction) => {
     try {

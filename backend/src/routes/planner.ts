@@ -9,7 +9,15 @@ const router = Router();
 const WALK_ONLY_MAX     = 1.2;  // km: if origin→dest < this, just walk
 const WALK_TO_STAND_MAX = 3.0;  // km: max walk to first/last stand
 const WALK_TRANSFER_MAX = 0.8;  // km: max walk between stands as a transfer
-const MAX_BFS_NODES     = 2000; // safety cap to avoid infinite loops
+const MAX_NODES         = 5000; // safety cap to avoid infinite loops
+
+// ── Dijkstra cost weights ──────────────────────────────────────────────────
+// Walking is penalised heavily so the planner prefers a nearby start stand
+// (short walk + ride) over a far start stand (long walk + direct ride).
+// 1km walk ≈ 12-15 min, 1km auto ≈ 3-4 min → walk is ~4x "costlier" per km.
+const WALK_COST_PER_KM     = 4.0;  // multiplier on walk distance
+const AUTO_COST_PER_KM    = 1.0;  // multiplier on ride distance
+const TRANSFER_PENALTY    = 0.5;  // fixed cost added on every transfer between stands
 
 // ── Haversine distance ─────────────────────────────────────────────────────
 function dist(lat1: number, lon1: number, lat2: number, lon2: number): number {
@@ -32,7 +40,7 @@ interface GraphEdge {
     edgeType: EdgeType;
     routeId?:   number;
     routeName?: string | null;
-    walkDistKm?: number;
+    distKm:     number;  // distance of this edge (walk or ride, in km)
 }
 
 // ── BFS path segment ──────────────────────────────────────────────────────
@@ -42,7 +50,7 @@ interface PathStep {
     edgeType:    EdgeType;
     routeId?:    number;
     routeName?:  string | null;
-    walkDistKm?: number;
+    distKm:      number;
 }
 
 router.get('/plan-trip', async (req, res) => {
@@ -136,13 +144,22 @@ router.get('/plan-trip', async (req, res) => {
             // Deduplicate consecutive duplicates
             const unique = ordered.filter((id, i) => i === 0 || id !== ordered[i - 1]);
 
+            // Resolve stand coordinates for distance calc
+            const coords = unique.map(id => standMap.get(id)).filter(Boolean) as typeof allStands;
+
             for (let i = 0; i < unique.length; i++) {
                 for (let j = i + 1; j < unique.length; j++) {
+                    const fromStand = standMap.get(unique[i]);
+                    const toStand   = standMap.get(unique[j]);
+                    if (!fromStand || !toStand) continue;
+                    // auto distance = straight-line distance between the two stands
+                    const rideDist = dist(fromStand.lat, fromStand.lng, toStand.lat, toStand.lng);
                     addEdge(unique[i], {
                         toStandId: unique[j],
                         edgeType:  'auto',
                         routeId:   route.id,
                         routeName: route.name,
+                        distKm:    rideDist,
                     });
                 }
             }
@@ -157,70 +174,79 @@ router.get('/plan-trip', async (req, res) => {
                 const d = dist(s1.lat, s1.lng, s2.lat, s2.lng);
                 if (d <= WALK_TRANSFER_MAX) {
                     addEdge(s1.id, {
-                        toStandId:   s2.id,
-                        edgeType:    'walk_transfer',
-                        walkDistKm:  d,
+                        toStandId: s2.id,
+                        edgeType:  'walk_transfer',
+                        distKm:    d,
                     });
                 }
             }
         }
 
-        // ── 4. BFS — fewest edges (prefer auto hops) ──────────────────────
-        interface QueueItem {
+        // ── 4. Dijkstra — lowest total cost, with walk heavily penalised ───
+        // Cost model (all in "minutes-like" units):
+        //   - auto ride:  distKm * AUTO_COST_PER_KM
+        //   - walk:       distKm * WALK_COST_PER_KM   (4x costlier → prefer riding)
+        //   - any edge:   + TRANSFER_PENALTY          (discourage stand-hopping)
+        const costOf = (edge: GraphEdge): number => {
+            const perKm = edge.edgeType === 'auto' ? AUTO_COST_PER_KM : WALK_COST_PER_KM;
+            return edge.distKm * perKm + TRANSFER_PENALTY;
+        };
+
+        interface DNode {
             standId: number;
-            path: PathStep[];
-            autoHops: number;
+            cost:    number;
+            path:    PathStep[];
         }
 
-        const queue: QueueItem[] = startStands.map(x => ({
-            standId:  x.stand.id,
-            path:     [],
-            autoHops: 0,
+        // Binary-heap-free priority queue: array kept sorted by cost (small graphs).
+        const pq: DNode[] = startStands.map(x => ({
+            standId: x.stand.id,
+            cost:    0,
+            path:    [],
         }));
 
-        // visited key = standId (simple BFS, first arrival is shortest)
-        const visited = new Set<number>(startStands.map(x => x.stand.id));
+        const bestCost = new Map<number, number>();  // standId → lowest cost seen
 
         let bestPath: PathStep[] | null = null;
         let explored = 0;
 
-        while (queue.length > 0 && explored < MAX_BFS_NODES) {
+        while (pq.length > 0 && explored < MAX_NODES) {
             explored++;
-            const current = queue.shift()!;
+            // Pop the lowest-cost node
+            pq.sort((a, b) => a.cost - b.cost);
+            const current = pq.shift()!;
 
+            // If we've reached an end stand, we have the cheapest trip → done
             if (endStandIds.has(current.standId)) {
                 bestPath = current.path;
                 break;
             }
 
             const edges = graph.get(current.standId) || [];
+            for (const edge of edges) {
+                const stepCost = costOf(edge);
+                const newCost  = current.cost + stepCost;
+                const prevCost = bestCost.get(edge.toStandId);
 
-            // Prioritise auto edges over walk transfer edges so we prefer riding
-            const sorted = [...edges].sort((a, b) => {
-                if (a.edgeType === 'auto' && b.edgeType !== 'auto') return -1;
-                if (a.edgeType !== 'auto' && b.edgeType === 'auto') return  1;
-                return 0;
-            });
+                // Only relax if this route to the stand is cheaper than any prior
+                if (prevCost !== undefined && newCost >= prevCost) continue;
+                bestCost.set(edge.toStandId, newCost);
 
-            for (const edge of sorted) {
-                if (!visited.has(edge.toStandId)) {
-                    visited.add(edge.toStandId);
-                    queue.push({
-                        standId:  edge.toStandId,
-                        autoHops: current.autoHops + (edge.edgeType === 'auto' ? 1 : 0),
-                        path: [
-                            ...current.path,
-                            {
-                                fromStandId: current.standId,
-                                toStandId:   edge.toStandId,
-                                edgeType:    edge.edgeType,
-                                routeId:     edge.routeId,
-                                routeName:   edge.routeName,
-                                walkDistKm:  edge.walkDistKm,
-                            }
-                        ],
-                    });
-                }
+                pq.push({
+                    standId: edge.toStandId,
+                    cost:    newCost,
+                    path: [
+                        ...current.path,
+                        {
+                            fromStandId: current.standId,
+                            toStandId:   edge.toStandId,
+                            edgeType:    edge.edgeType,
+                            routeId:     edge.routeId,
+                            routeName:   edge.routeName,
+                            distKm:      edge.distKm,
+                        }
+                    ],
+                });
             }
         }
 
@@ -244,6 +270,9 @@ router.get('/plan-trip', async (req, res) => {
             type:        'walk',
             instruction: `Walk to ${firstStand.name}`,
             distanceKm:  walkToFirst,
+            // endpoints so the frontend can draw the walk segment
+            from:        { lat, lng },
+            to:          { lat: firstStand.lat, lng: firstStand.lng },
         });
 
         // Merge consecutive same-route auto edges; emit walk_transfer as walk legs
@@ -253,10 +282,13 @@ router.get('/plan-trip', async (req, res) => {
 
             if (step.edgeType === 'walk_transfer') {
                 const s = standMap.get(step.toStandId)!;
+                const prevStand = standMap.get(step.fromStandId)!;
                 legs.push({
                     type:        'walk',
                     instruction: `Walk to ${s.name}`,
-                    distanceKm:  step.walkDistKm ?? 0,
+                    distanceKm:  step.distKm ?? 0,
+                    from:        { lat: prevStand.lat, lng: prevStand.lng },
+                    to:          { lat: s.lat, lng: s.lng },
                 });
                 i++;
                 continue;
@@ -298,12 +330,17 @@ router.get('/plan-trip', async (req, res) => {
             type:        'walk',
             instruction: `Walk from ${lastStand.name} to your destination`,
             distanceKm:  walkToEnd,
+            from:        { lat: lastStand.lat, lng: lastStand.lng },
+            to:          { lat: destLat, lng: destLng },
         });
 
         return res.json({
             type:           'trip',
             message:        'Trip plan calculated.',
             totalDistanceKm: directDist,
+            // origin & destination points so the frontend can render start/end markers
+            origin:      { lat, lng },
+            destination: { lat: destLat, lng: destLng },
             legs,
         });
 
